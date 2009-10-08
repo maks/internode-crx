@@ -1,0 +1,27 @@
+<html>
+<head>
+<script>
+    function showUser(username) {
+        console.log("doing setUser"+username);
+        var elm = document.getElementById('username');
+        elm.value = username;
+    }
+      
+    function go() {
+        var u =  document.getElementById('username').value;
+        chrome.extension.getBackgroundPage().testrun(u);
+    }
+
+</script>
+
+<div class="toolstrip-button"  onclick="window.open('internode-api.html')" >
+    <span>Internode quota for:</span>
+</div>
+<img src="test-button2.png" onclick="window.open('config.html')" />
+
+<div class="toolstrip-button" onclick="go()" >
+run test
+</div>
+
+</body>
+</html>

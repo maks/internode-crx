@@ -1,0 +1,140 @@
+<html>
+<head>
+<script>
+
+var req; //global to give callbacks easy access to it
+
+function saveConfig(form) {
+
+	try {
+		console.debug(form[0].value);
+		setCredentials(form[0].value, form[1].value);
+	
+		fetchCustomerID(
+			function(data) {
+			    try {
+    				console.log("cust id callback");
+        			//var custID = req.responseXML.getElementsByTagName("service");
+        			//window.localStorage.setItem("custID",  custID);
+        			//console.log("saved custID:"+window.localStorage.getItem("custID"));
+        			//fetchQuotaData("/usage");
+			    } catch(e) {
+			    	console.log("err in custid callback:"+e);
+				}      
+    		},
+    	    form[0].value, form[1].value
+        );
+    
+	} catch(e) {
+	    console.error("err:"+e);
+	} finally {	
+		   return false; //stop an further event processing
+	}
+}
+
+function setCredentials(username, password) {
+    if (username && password) {
+        window.localStorage.setItem("username",  username);
+        window.localStorage.setItem("passwd",  password);           
+    }
+    console.log("saved user:"+window.localStorage.getItem("username"));
+}
+
+function fetchCustomerID(callback, username, password) {
+	req = new XMLHttpRequest();
+	req.open(
+	    "GET",
+	    "https://customer-webtools-api.internode.on.net"+
+	    "/api/v1.5/", 
+	    true,
+	    username,
+	    password);
+	 req.onreadystatechange = callback;
+	 req.send(null);
+}
+
+function fetchQuotaData(cmd) {        
+    var customerID = window.localStorage.getItem("custID");
+    var username = window.localStorage.getItem("username");
+    var password = window.localStorage.getItem("passwd");
+    var apiCmd = cmd || "";
+	if (customerID) {
+
+		req = new XMLHttpRequest();
+        req.open(
+            "GET",
+            "https://customer-webtools-api.internode.on.net"+
+            "/api/v1.5/"+
+            customerID+
+            apiCmd, 
+            true,
+            username,
+            password);
+	    req.onreadystatechange = showResults;
+	    req.send(null);
+		
+		//setInterval(fetchQuotaData(cmd), 60 * 60 * 1000)//schedule next data update for 1 hour
+	} else {
+	    console.log("no cust id");
+	}        
+}
+
+function run() {
+     console.debug("u:"+window.localStorage.getItem("username"));
+     
+     fetchCustomerID(
+       function() {
+           try {
+        	   if (req.readyState == 4) { 
+                 if (req.status == 200) {
+                   var custID = req.responseXML.getElementsByTagName("service")[0].textContent;
+                   console.log(req.responseXML.getElementsByTagName("service")[0]);
+
+                   window.localStorage.setItem("custID",  custID);
+                   console.log("saved custID:"+window.localStorage.getItem("custID"));
+                   fetchQuotaData("/usage");
+                 } else {
+                     console.log("err in custid xhr"+req.statusText);
+                 }
+        	   }
+           } catch(e) {
+               console.log("err in custid callback:"+e);
+           }      
+         },
+         window.localStorage.getItem("username"),
+         window.localStorage.getItem("passwd")
+   );
+}
+
+function showResults() {    
+  try {
+	  if (req.readyState == 4) { 
+          if (req.status == 200) {
+            var resTag = document.getElementById("results");
+            
+            var usage = req.responseXML.getElementsByTagName("traffic")[0].textContent;
+            var useInMegs = Math.round(parseInt(usage) / 1000000);
+            console.log("usage:"+useInMegs+"mb");
+            //resTag.appendChild(results);
+          }
+	  }
+  } catch(e) {
+    console.log("show results err:"+e);
+  }       
+}
+</script>
+</head>
+
+<body>
+<form onsubmit="return saveConfig(this);"><label>Username</label><input
+	type="text" name="username" /> <br />
+<label>Password</label><input type="password" name="password" /> <br />
+<input type="submit" value="Save" />
+</form>
+
+<input type="button" value="Run" onclick="return run();" />
+
+<h2>Quota</h2>
+<div id="quota"></div>
+</body>
+</html>

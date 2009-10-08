@@ -1,0 +1,12 @@
+{
+    "name": "Internode extension",
+    "version": "1.0",
+    "description": "Extension to display Internode customers ADSL quota usage",
+    "toolstrips": [
+        "my_toolstrip.html"
+    ],
+    "background_page": "test.html",
+    "permissions": [
+        "https://customer-webtools-api.internode.on.net/"
+    ]
+}
