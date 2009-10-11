@@ -57,7 +57,7 @@ function fetchQuotaData(cmd) {
     var customerID = window.localStorage.getItem("custID");
     var username = window.localStorage.getItem("username");
     var password = window.localStorage.getItem("passwd");
-    var apiCmd = cmd || "";
+    var apiCmd = cmd || "/usage";
 	if (customerID) {
 
 		req = new XMLHttpRequest();
@@ -81,6 +81,11 @@ function fetchQuotaData(cmd) {
 
 function run() {
      console.debug("u:"+window.localStorage.getItem("username"));
+
+     if (window.localStorage.getItem("custID")) {
+    	 fetchQuotaData();
+         return;       
+     }
      
      fetchCustomerID(
        function() {
@@ -109,17 +114,25 @@ function run() {
 function showResults() {    
   try {
 	  if (req.readyState == 4) { 
-          if (req.status == 200) {
-            var resTag = document.getElementById("results");
-            
-            var usage = req.responseXML.getElementsByTagName("traffic")[0].textContent;
-            var useInMegs = Math.round(parseInt(usage) / 1000000);
-            console.log("usage:"+useInMegs+"mb");
-            //resTag.appendChild(results);
+          if (req.status == 200) {  
+            var resTag = document.getElementById("quota");
+
+            var result = req.responseXML.getElementsByTagName("traffic"); 
+
+            if (result && result[0]) {
+              var usage = result[0].textContent;
+              var useInMegs = (parseInt(usage) / Math.pow(2, 20));
+              console.log("usage:"+useInMegs+"mb");
+              var dv = document.createElement("div");
+              resTag.appendChild(dv);
+              dv.innerHTML = useInMegs.toFixed(2)+"MB";              
+            } else {
+                console.log("err getting usage"+req.responseText);
+            }
           }
 	  }
   } catch(e) {
-    console.log("show results err:"+e);
+    console.log(e);
   }       
 }
 </script>
