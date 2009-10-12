@@ -7,6 +7,7 @@
     ],
     "background_page": "test.html",
     "permissions": [
+        "tabs",
         "https://customer-webtools-api.internode.on.net/"
     ]
 }

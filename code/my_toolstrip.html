@@ -1,23 +1,30 @@
 <html>
 <head>
 <script>
+    var currentConfigTabID;
+
+    function openTabCB(tab) {
+        currentConfigTabID = tab.id;
+        console.log("curr tab id:"+tab.id);
+    }
+
     function showUser(username) {
         console.log("doing setUser"+username);
         var elm = document.getElementById('username');
         elm.value = username;
     }
       
-    function go() {
-        var u =  document.getElementById('username').value;
-        chrome.extension.getBackgroundPage().testrun(u);
-    }
-
+	function go() {
+		var u = document.getElementById('username').value;
+		chrome.extension.getBackgroundPage().testrun(u);
+	}
 </script>
 
 <div class="toolstrip-button"  onclick="window.open('internode-api.html')" >
     <span>Internode quota for:</span>
 </div>
-<img src="prefs.png" onclick="window.open('config.html')" alt="show in pop" />
+<img src="prefs.png" onclick="chrome.tabs.create({url :'config.html', selected: true}, openTabCB)" 
+    alt="show in pop" />
 
 <div class="toolstrip-button" onclick="go()" >
 run test
