@@ -1,0 +1,123 @@
+<html>
+<head>
+
+<script>
+
+var req;
+
+function setCredentials(username, password) {
+    if (username && password) {
+        localStorage.setItem("username",  username);
+        localStorage.setItem("password",  password);           
+    }
+    console.log("saved user:"+window.localStorage.getItem("username"));
+}
+
+
+function saveCustomerID() {
+    console.log("save custid callback"+req.readyState+"  stat:"+req.status);  
+    try {  
+       if (req.readyState == 4) { 
+         if (req.status == 200) {
+           var custID = req.responseXML.getElementsByTagName("service")[0].textContent;
+           console.log(req.responseXML.getElementsByTagName("service")[0]);
+
+           localStorage.setItem("custID",  custID);
+           console.log("saved custID:"+window.localStorage.getItem("custID"));
+           fetchQuotaData("/usage");
+         } else {
+             console.log("err in custid xhr"+req.statusText);
+         }
+       }
+   } catch(e) {
+       console.log("err in custid callback:"+e);
+   }      
+}
+
+
+function fetchCustomerID() {
+    if (!localStorage.getItem("password") || 
+            localStorage.getItem("custID") ) {
+        console.log("skipping custid fetch");
+        return;
+    }
+    try {
+        console.log("fetching custid...");
+        req = new XMLHttpRequest();
+        req.open(
+            "GET",
+            "https://customer-webtools-api.internode.on.net"+
+            "/api/v1.5/", 
+            true,
+            localStorage.getItem("username"),
+            localStorage.getItem("password")
+            );
+            
+         req.onload = saveCustomerID;
+         req.send(null);
+         console.log("sent cusid req"+localStorage.getItem("username"));
+     } catch(e) {
+        console.log("fetch custid err:"+e);
+     }
+}
+
+function fetchQuotaData(cmd) {        
+    var customerID = window.localStorage.getItem("custID");
+    var username = window.localStorage.getItem("username");
+    var password = window.localStorage.getItem("password");
+    var apiCmd = cmd || "/usage";
+    if (customerID) {
+
+        req = new XMLHttpRequest();
+        req.open(
+            "GET",
+            "https://customer-webtools-api.internode.on.net"+
+            "/api/v1.5/"+
+            customerID+
+            apiCmd, 
+            true,
+            username,
+            password);
+        req.onreadystatechange = showResults;
+        req.send(null);
+        
+        //setInterval(fetchQuotaData(cmd), 60 * 60 * 1000)//schedule next data update for 1 hour
+    } else {
+        console.log("no cust id");
+    }        
+}
+
+function showResults() {    
+  try {
+      if (req.readyState == 4) { 
+          if (req.status == 200) {
+            var result = req.responseXML.getElementsByTagName("traffic"); 
+
+            if (result && result[0]) {
+              var usage = result[0].textContent;
+              var useInMegs = (parseInt(usage) / Math.pow(2, 20));
+              console.log("usage:"+useInMegs+"mb");
+              
+              var views = chrome.extension.getViews();
+              for (var i in views) {
+                if (views[i].enableCheckbox) {
+                    views[i].enableCheckbox(checked);
+                    }
+              }
+             
+             
+            } else {
+                console.log("err getting usage"+req.responseText);
+            }
+          }
+      }
+  } catch(e) {
+    console.log(e);
+  }       
+}
+
+</script>
+
+</head>
+
+</html>

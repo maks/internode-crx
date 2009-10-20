@@ -3,15 +3,17 @@
 <script>
     var currentConfigTabID;
 
+    // call back to store ID of config tab
     function openTabCB(tab) {
         currentConfigTabID = tab.id;
         console.log("curr tab id:"+tab.id);
     }
-
-    function showUser(username) {
-        console.log("doing setUser"+username);
-        var elm = document.getElementById('username');
-        elm.value = username;
+    
+    function displayUsage(useInMegs) {
+        var resTag = document.getElementById("quota");
+        var dv = document.createElement("div");
+        resTag.appendChild(dv);
+        dv.innerHTML = useInMegs.toFixed(2)+"MB";   
     }
       
 	function go() {
@@ -20,14 +22,14 @@
 	}
 </script>
 
-<div class="toolstrip-button"  onclick="window.open('internode-api.html')" >
-    <span>Internode quota for:</span>
+<div  id ="quota" class="toolstrip-button"  onclick="window.open('internode-api.html')" >
 </div>
+
 <img src="prefs.png" onclick="chrome.tabs.create({url :'config.html', selected: true}, openTabCB)" 
-    alt="show in pop" />
+    alt="display configuration" />
 
 <div class="toolstrip-button" onclick="go()" >
-run test
+test
 </div>
 
 </body>

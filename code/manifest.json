@@ -5,7 +5,7 @@
     "toolstrips": [
         "my_toolstrip.html"
     ],
-    "background_page": "test.html",
+    "background_page": "background.html",
     "permissions": [
         "tabs",
         "https://customer-webtools-api.internode.on.net/"
