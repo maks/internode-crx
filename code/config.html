@@ -3,36 +3,18 @@
 <title>Internode Usage Monitor - Settings</title>
 <script>
 
-var req; //global to give callbacks easy access to it
-
 function saveConfig(form) {
-
     try {
         console.debug(form[0].value);
         chrome.extension.getBackgroundPage().setCredentials(form[0].value, form[1].value);    
         chrome.extension.getBackgroundPage().fetchCustomerID();    
     } catch(e) {
+        //TODO: show user visible errr message
         console.error("Err:"+e);
     } finally {	
-        return false; //stop an further event processing
+        return false; //stop any further event processing
     }
 }
-
-
-function run() {
-     console.debug("u:"+window.localStorage.getItem("username"));
-
-     if (window.localStorage.getItem("custID")) {
-         chrome.extension.getBackgroundPage().fetchQuotaData();
-         return;       
-     }
-     
-     chrome.extension.getBackgroundPage().fetchCustomerID(
-         chrome.extension.getBackgroundPage().saveCustID
-     );
-}
-
-
 
 
 </script>

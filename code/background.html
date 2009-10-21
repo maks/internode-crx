@@ -3,14 +3,18 @@
 
 <script>
 
+var USERNAME_KEY = "username";
+var PASSWORD_KEY = "password";
+var CUSTOMERID_KEY = "custID";
+
 var req;
 
 function setCredentials(username, password) {
     if (username && password) {
-        localStorage.setItem("username",  username);
-        localStorage.setItem("password",  password);           
+        localStorage.setItem(USERNAME_KEY,  username);
+        localStorage.setItem(PASSWORD_KEY,  password);           
     }
-    console.log("saved user:"+window.localStorage.getItem("username"));
+    console.log("saved user:"+window.localStorage.getItem(USERNAME_KEY));
 }
 
 
@@ -22,8 +26,8 @@ function saveCustomerID() {
            var custID = req.responseXML.getElementsByTagName("service")[0].textContent;
            console.log(req.responseXML.getElementsByTagName("service")[0]);
 
-           localStorage.setItem("custID",  custID);
-           console.log("saved custID:"+window.localStorage.getItem("custID"));
+           localStorage.setItem("CUSTOMERID_KEY",  custID);
+           console.log("saved custID:"+window.localStorage.getItem("CUSTOMERID_KEY"));
            fetchQuotaData("/usage");
          } else {
              console.log("err in custid xhr"+req.statusText);
@@ -36,8 +40,8 @@ function saveCustomerID() {
 
 
 function fetchCustomerID() {
-    if (!localStorage.getItem("password") || 
-            localStorage.getItem("custID") ) {
+    if (!localStorage.getItem(PASSWORD_KEY) || 
+            localStorage.getItem("CUSTOMERID_KEY") ) {
         console.log("skipping custid fetch");
         return;
     }
@@ -49,22 +53,22 @@ function fetchCustomerID() {
             "https://customer-webtools-api.internode.on.net"+
             "/api/v1.5/", 
             true,
-            localStorage.getItem("username"),
-            localStorage.getItem("password")
+            localStorage.getItem(USERNAME_KEY),
+            localStorage.getItem(PASSWORD_KEY)
             );
             
          req.onload = saveCustomerID;
          req.send(null);
-         console.log("sent cusid req"+localStorage.getItem("username"));
+         console.log("sent cusid req"+localStorage.getItem(USERNAME_KEY));
      } catch(e) {
         console.log("fetch custid err:"+e);
      }
 }
 
 function fetchQuotaData(cmd) {        
-    var customerID = window.localStorage.getItem("custID");
-    var username = window.localStorage.getItem("username");
-    var password = window.localStorage.getItem("password");
+    var customerID = window.localStorage.getItem("CUSTOMERID_KEY");
+    var username = window.localStorage.getItem(USERNAME_KEY);
+    var password = window.localStorage.getItem(PASSWORD_KEY);
     var apiCmd = cmd || "/usage";
     if (customerID) {
 
@@ -115,6 +119,8 @@ function showResults() {
     console.log(e);
   }       
 }
+
+setInterval(updateUsage, 60 * 60 * 1000);
 
 </script>
 
