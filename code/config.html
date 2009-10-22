@@ -27,7 +27,8 @@ function saveConfig(form) {
 <input type="submit" value="Save" />
 </form>
 
-<input type="button" value="Run" onclick="return run();" />
+<input type="button" value="Update" 
+    onclick="return chrome.extension.getBackgroundPage().fetchQuotaData();" />
 
 </body>
 </html>

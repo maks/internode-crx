@@ -7,6 +7,8 @@ var USERNAME_KEY = "username";
 var PASSWORD_KEY = "password";
 var CUSTOMERID_KEY = "custID";
 
+var API_BASE_URL = "https://customer-webtools-api.internode.on.net/api/v1.5/";
+
 var req;
 
 function setCredentials(username, password) {
@@ -26,8 +28,8 @@ function saveCustomerID() {
            var custID = req.responseXML.getElementsByTagName("service")[0].textContent;
            console.log(req.responseXML.getElementsByTagName("service")[0]);
 
-           localStorage.setItem("CUSTOMERID_KEY",  custID);
-           console.log("saved custID:"+window.localStorage.getItem("CUSTOMERID_KEY"));
+           localStorage.setItem(CUSTOMERID_KEY,  custID);
+           console.log("saved custID:"+window.localStorage.getItem(CUSTOMERID_KEY));
            fetchQuotaData("/usage");
          } else {
              console.log("err in custid xhr"+req.statusText);
@@ -40,9 +42,16 @@ function saveCustomerID() {
 
 
 function fetchCustomerID() {
-    if (!localStorage.getItem(PASSWORD_KEY) || 
-            localStorage.getItem("CUSTOMERID_KEY") ) {
-        console.log("skipping custid fetch");
+	var customerID = window.localStorage.getItem(CUSTOMERID_KEY);
+    var username = window.localStorage.getItem(USERNAME_KEY);
+    var password = window.localStorage.getItem(PASSWORD_KEY);
+
+    if (!username || !password) {
+         console.log("skipped custid fetch ,no userid or passwd");
+         return;
+    }
+    if (customerID) {
+    	console.log("skipped custid fetch, already have custid"+customerID);
         return;
     }
     try {
@@ -50,11 +59,10 @@ function fetchCustomerID() {
         req = new XMLHttpRequest();
         req.open(
             "GET",
-            "https://customer-webtools-api.internode.on.net"+
-            "/api/v1.5/", 
+            API_BASE_URL, 
             true,
-            localStorage.getItem(USERNAME_KEY),
-            localStorage.getItem(PASSWORD_KEY)
+            username,
+            password
             );
             
          req.onload = saveCustomerID;
@@ -66,28 +74,28 @@ function fetchCustomerID() {
 }
 
 function fetchQuotaData(cmd) {        
-    var customerID = window.localStorage.getItem("CUSTOMERID_KEY");
+    var customerID = window.localStorage.getItem(CUSTOMERID_KEY);
     var username = window.localStorage.getItem(USERNAME_KEY);
     var password = window.localStorage.getItem(PASSWORD_KEY);
+
+    if (!username || !password) {
+    	 console.log("skipped,no userid or passwd");
+         return;
+    }
+    
     var apiCmd = cmd || "/usage";
     if (customerID) {
-
         req = new XMLHttpRequest();
         req.open(
             "GET",
-            "https://customer-webtools-api.internode.on.net"+
-            "/api/v1.5/"+
-            customerID+
-            apiCmd, 
+            API_BASE_URL+customerID+apiCmd, 
             true,
             username,
             password);
         req.onreadystatechange = showResults;
         req.send(null);
-        
-        //setInterval(fetchQuotaData(cmd), 60 * 60 * 1000)//schedule next data update for 1 hour
     } else {
-        console.log("no cust id");
+        console.log("skipped,no cust id");
     }        
 }
 
@@ -104,12 +112,10 @@ function showResults() {
               
               var views = chrome.extension.getViews();
               for (var i in views) {
-                if (views[i].enableCheckbox) {
-                    views[i].enableCheckbox(checked);
-                    }
+                if (views[i].displayUsage) {
+                    views[i].displayUsage(useInMegs);
+                }
               }
-             
-             
             } else {
                 console.log("err getting usage"+req.responseText);
             }
@@ -120,7 +126,7 @@ function showResults() {
   }       
 }
 
-setInterval(updateUsage, 60 * 60 * 1000);
+setInterval(fetchQuotaData, 60 * 60 * 1000);
 
 </script>
 
