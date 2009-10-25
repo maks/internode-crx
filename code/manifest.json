@@ -1,10 +1,14 @@
 {
-    "name": "Internode extension",
+    "name": "Internode Usage Meter",
     "version": "1.0",
     "description": "Extension to display Internode customers ADSL quota usage",
     "toolstrips": [
         "my_toolstrip.html"
     ],
+    icons : {
+        64: "internode_logo-64.png",
+        
+    },
     "background_page": "background.html",
     "permissions": [
         "tabs",
