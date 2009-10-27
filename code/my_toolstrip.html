@@ -12,9 +12,15 @@
     function displayUsage(useInMegs) {
         var resTag = document.getElementById("quota");
         var dv = document.createElement("div");
+        dv.innerHTML = useInMegs.toFixed(2)+"MB";
+        resTag.removeChild(resTag.lastChild);
         resTag.appendChild(dv);
-        dv.innerHTML = useInMegs.toFixed(2)+"MB";   
+           
     }
+
+    function showDetails() {
+        console.log("showing details..");
+    }   
       
 	function go() {
 		var u = document.getElementById('username').value;
@@ -22,10 +28,10 @@
 	}
 </script>
 
-<div  id ="quota" class="toolstrip-button"  onclick="window.open('internode-api.html')" >
+<div  id ="quota" class="toolstrip-button"  onclick="showDetails();" >
 </div>
 
-<img src="prefs.png" onclick="chrome.tabs.create({url :'config.html', selected: true}, openTabCB)" 
+<img src="internode_logo-32.png" onclick="chrome.tabs.create({url :'config.html', selected: true}, openTabCB)" 
     alt="display configuration" />
 
 </body>

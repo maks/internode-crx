@@ -5,10 +5,11 @@
     "toolstrips": [
         "my_toolstrip.html"
     ],
-    icons : {
-        64: "internode_logo-64.png",
-        
-    },
+    "icons": { 
+           "16": "internode_logo-16.png",
+           "32": "internode_logo-32.png",
+           "48": "internode_logo-32.png",
+          "128": "internode_logo-128.png" },
     "background_page": "background.html",
     "permissions": [
         "tabs",
