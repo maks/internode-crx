@@ -11,6 +11,12 @@ var API_BASE_URL = "https://customer-webtools-api.internode.on.net/api/v1.5/";
 
 var req;
 
+var currentDetails = {
+  "usage": 0,
+  "quota": 0,
+  "periodEnd" : null       
+}
+
 function setCredentials(username, password) {
     if (username && password) {
         localStorage.setItem(USERNAME_KEY,  username);
@@ -106,14 +112,28 @@ function showResults() {
             var result = req.responseXML.getElementsByTagName("traffic"); 
 
             if (result && result[0]) {
+              console.debug("http text:"+req.responseText);  
               var usage = result[0].textContent;
-              var useInMegs = (parseInt(usage) / Math.pow(2, 20));
-              console.log("usage:"+useInMegs+"mb");
+              currentDetails.usage = parseInt(usage);
+              console.log("usage:"+currentDetails.usage+"mb");
+
+              currentDetails.quota = parseInt(result[0].getAttribute("quota"));
+              currentDetails.periodEnd = parseInternodeDate(
+                      result[0].getAttribute("rollover"));
+
+              var unit = result[0].getAttribute("unit");
+
+              if (unit == "bytes") {
+            	  currentDetails.usage = currentDetails.usage / (1 * 1000000);
+                  currentDetails.quota = currentDetails.quota / (1 * 1000000);
+              }
+
+              console.log("quota:"+currentDetails.quota+" until:"+currentDetails.periodEnd);
               
               var views = chrome.extension.getViews();
               for (var i in views) {
                 if (views[i].displayUsage) {
-                    views[i].displayUsage(useInMegs);
+                    views[i].displayUsage(currentDetails.usage);
                 }
               }
             } else {
@@ -124,6 +144,15 @@ function showResults() {
   } catch(e) {
     console.log(e);
   }       
+}
+
+function parseInternodeDate(dateStr) {
+    var toks = dateStr.split("-");
+    var d = new Date();
+    d.setYear(parseInt(toks[0]));
+    d.setMonth(parseInt(toks[1])-1);
+    d.setDate(parseInt(toks[2]));
+    return d;    
 }
 
 setInterval(fetchQuotaData, 60 * 60 * 1000); //refresh every hour

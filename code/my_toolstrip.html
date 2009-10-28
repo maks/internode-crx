@@ -13,6 +13,7 @@
         var resTag = document.getElementById("quota");
         var dv = document.createElement("div");
         dv.innerHTML = useInMegs.toFixed(2)+"MB";
+        dv.onClick = showDetails();
         resTag.removeChild(resTag.lastChild);
         resTag.appendChild(dv);
            
@@ -20,6 +21,8 @@
 
     function showDetails() {
         console.log("showing details..");
+        var details = chrome.extension.getBackgroundPage().currentDetails;
+        console.log("curr"+details.usage+" "+details.quote);
     }   
       
 	function go() {
@@ -28,7 +31,7 @@
 	}
 </script>
 
-<div  id ="quota" class="toolstrip-button"  onclick="showDetails();" >
+<div id ="quota" class="toolstrip-button" >
 </div>
 
 <img src="internode_logo-32.png" onclick="chrome.tabs.create({url :'config.html', selected: true}, openTabCB)" 
