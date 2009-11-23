@@ -1,16 +1,19 @@
 {
     "name": "Internode Usage Meter",
-    "version": "1.0",
+    "version": "1.1",
     "description": "Extension to display Internode customers ADSL quota usage",
-    "toolstrips": [
-        "my_toolstrip.html"
-    ],
+    "browser_action": {
+        "default_icon": "internode_logo-19.png",  // optional
+        "default_title": "Click for usage meter stats",  // required
+        "popup": { "path": "config.html", "height": 79 }  // optional
+    },
     "icons": { 
            "16": "internode_logo-16.png",
            "32": "internode_logo-32.png",
            "48": "internode_logo-32.png",
           "128": "internode_logo-128.png" },
     "background_page": "background.html",
+    "options_page": "config.html",
     "permissions": [
         "tabs",
         "https://customer-webtools-api.internode.on.net/"
