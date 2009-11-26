@@ -6,16 +6,14 @@
 var USERNAME_KEY = "username";
 var PASSWORD_KEY = "password";
 var CUSTOMERID_KEY = "custID";
+var USAGE_KEY = "usage";
+var QUOTA_KEY = "quota";
+var PERIOD_END_KEY = "periodEndDate";
+
 
 var API_BASE_URL = "https://customer-webtools-api.internode.on.net/api/v1.5/";
 
 var req;
-
-var currentDetails = {
-  "usage": 0,
-  "quota": 0,
-  "periodEnd" : null       
-}
 
 function setCredentials(username, password) {
     if (username && password) {
@@ -98,14 +96,14 @@ function fetchQuotaData(cmd) {
             true,
             username,
             password);
-        req.onreadystatechange = showResults;
+        req.onreadystatechange = saveResults;
         req.send(null);
     } else {
         console.log("skipped,no cust id");
     }        
 }
 
-function showResults() {    
+function saveResults() {    
   try {
       if (req.readyState == 4) { 
           if (req.status == 200) {
@@ -114,12 +112,18 @@ function showResults() {
             if (result && result[0]) {
               console.debug("http text:"+req.responseText);  
               var usage = result[0].textContent;
-              currentDetails.usage = parseInt(usage);
-              console.log("usage:"+currentDetails.usage+"mb");
+              //currentDetails.usage = parseInt(usage);
+              window.localStorage.setItem(USAGE_KEY, parseInt(usage));
+              console.log("saved usage:"+window.localStorage.getItem(USAGE_KEY)+"mb");
 
-              currentDetails.quota = parseInt(result[0].getAttribute("quota"));
-              currentDetails.periodEnd = parseInternodeDate(
-                      result[0].getAttribute("rollover"));
+              //currentDetails.quota = parseInt(result[0].getAttribute("quota"));
+              //currentDetails.periodEnd = parseInternodeDate(
+                      //result[0].getAttribute("rollover"));
+              window.localStorage.setItem(QUOTA_KEY, 
+            		  parseInt(result[0].getAttribute("quota")));
+
+              window.localStorage.setItem(PERIOD_END_KEY,
+            		  parseInternodeDate(result[0].getAttribute("rollover")));        
 
               var unit = result[0].getAttribute("unit");
 
@@ -127,15 +131,14 @@ function showResults() {
             	  currentDetails.usage = currentDetails.usage / (1 * 1000000);
                   currentDetails.quota = currentDetails.quota / (1 * 1000000);
               }
-
-              console.log("quota:"+currentDetails.quota+" until:"+currentDetails.periodEnd);
-              
+              /*
               var views = chrome.extension.getViews();
               for (var i in views) {
                 if (views[i].displayUsage) {
                     views[i].displayUsage(currentDetails.usage);
                 }
               }
+              */
             } else {
                 console.log("err getting usage"+req.responseText);
             }

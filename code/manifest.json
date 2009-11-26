@@ -5,7 +5,7 @@
     "browser_action": {
         "default_icon": "internode_logo-19.png",  // optional
         "default_title": "Click for usage meter stats",  // required
-        "popup": { "path": "config.html", "height": 79 }  // optional
+        "popup": { "path": "usage.html", "height": 79 }  // optional
     },
     "icons": { 
            "16": "internode_logo-16.png",
